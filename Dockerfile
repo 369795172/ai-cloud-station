@@ -21,7 +21,7 @@ RUN sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ss
 # 安装 Node.js、全局工具
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update && apt-get install -y nodejs \
-    && npm install -g pnpm playwright @anthropic-ai/claude-code \
+    && npm install -g pnpm playwright @anthropic-ai/claude-code anon-kode \
     && curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 安装 Playwright 浏览器依赖和 code-server

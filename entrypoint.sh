@@ -56,6 +56,7 @@ if [ ! -f "$README_FILE" ]; then
 | code-server | 最新 | VS Code Web 版 |
 | xfce4 / TigerVNC / noVNC | 最新 | 远程桌面环境 |
 | **Claude CLI** | 最新 | `@anthropic-ai/claude-code` |
+| **Anon Kode** | 最新 | 交互式 AI 编程助手 |
 | **uv** | 最新 | Rust 实现的极速 Python 包管理器 |
 | Git / Vim / curl / build-essential | - | 常用开发工具 |
 
