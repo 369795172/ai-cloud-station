@@ -44,6 +44,8 @@ if [ ! -f "$README_FILE" ]; then
    在 VS Code 终端或 SSH 中执行：
    ```bash
    claude --dangerously-skip-permissions
+   # 或使用简化别名
+   yolo
    ```
    该模式下，AI 可以无需人工确认直接执行命令，请谨慎使用。
 2. 如果在线IDE个别扩展功能不正常（又非常想用的情况下），请配置反向代理 + 域名 + SSL，并通过"https://域名"访问在线IDE，具体可以问问claude是怎么配的
@@ -56,13 +58,12 @@ if [ ! -f "$README_FILE" ]; then
 | OpenSSH Server | 最新 | 方便远程 SSH 登录 |
 | **Node.js** | 22.x | 由 NodeSource 仓库安装 |
 | pnpm | 最新 | 全局包管理器 |
-| **Python** | 3.10 | 系统自带 + `python3-pip` |
+| **Python** | 3.10 | 系统级 Python 3.10，python 命令已指向 python3 |
 | Poetry | 最新 | 现代化 Python 依赖管理 |
 | **Playwright** | 最新 | 以及 `chrome` 浏览器依赖 |
 | code-server | 最新 | VS Code Web 版 |
 | xfce4 / TigerVNC / noVNC | 最新 | 远程桌面环境 |
-| **Claude CLI** | 最新 | `@anthropic-ai/claude-code` |
-| **Anon Kode** | 最新 | 交互式 AI 编程助手 |
+| **Claude CLI** | 最新 | `@anthropic-ai/claude-code`，别名 `yolo` |
 | **uv** | 最新 | Rust 实现的极速 Python 包管理器 |
 | Git / Vim / curl / build-essential | - | 常用开发工具 |
 
@@ -103,7 +104,6 @@ echo "✅ noVNC (Web VNC client) started on port $VNC_PORT."
 
 # 启动 code-server (Web IDE)，并默认打开工作区
 # 所有路径都指向 /home/dev/workspace 下的持久化目录
-# 确保使用conda环境中的Python
 PASSWORD="$USER_PASSWORD" /usr/bin/code-server \
     --bind-addr 0.0.0.0:$VSCODE_PORT \
     --auth password \

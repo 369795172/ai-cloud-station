@@ -6,9 +6,10 @@
 
 ### 主要特性
 
-- **Miniconda 集成**: 预装 Miniconda 并激活 base 环境作为系统默认 Python，Poetry 也基于 conda 环境安装，提供完整的 Python 科学计算生态。
+- **Python 3.10 系统级集成**: 使用系统级 Python 3.10，`python` 命令直接指向 `python3`，Poetry 基于系统 Python 安装，环境更加简洁稳定。
 - **主机网络模式**: 容器与主机共享网络命名空间，可直接暴露任意端口，支持 WebSocket、HTTP 等所有协议的透传访问。
 - **灵活资源控制**: 支持通过 `--cpu` 和 `--memory` 参数精确控制容器资源，不指定时默认不限制。
+- **便捷别名**: 内置 `yolo` 别名，等价于 `claude --dangerously-skip-permissions`，一键启用 AI 全自动执行模式。
 
 ## 核心价值
 
@@ -144,11 +145,14 @@ A：可直接修改 Dockerfile，添加所需依赖和工具，重建镜像即�
 **Q5：多个容器使用主机网络模式时端口冲突怎么办？**  
 A：项目已通过端口基数机制解决此问题。每个用户使用不同的端口基数（如10、20、30），容器会自动使用对应的端口范围，避免冲突。
 
-**Q6：如何使用 conda 环境？**  
-A：容器已预装 Miniconda，base 环境自动激活。可以使用 `conda create`、`conda install` 等命令管理 Python 环境和包。Poetry 也基于 conda 的 Python 安装。
+**Q6：如何使用 Python 环境？**  
+A：容器使用系统级 Python 3.10，`python` 命令已指向 `python3`。可以使用 `pip`、`poetry` 或 `uv` 管理 Python 包。支持虚拟环境创建。
 
 **Q7：容器内服务如何被外部访问？**  
 A：由于使用主机网络模式，容器内启动的任何服务都可以通过主机 IP 直接访问，无需额外的端口映射配置。
+
+**Q8：如何快速启用 AI 全自动执行模式？**  
+A：容器内置了 `yolo` 别名，直接输入 `yolo` 即可启用 `claude --dangerously-skip-permissions` 模式，AI 可以无需人工确认直接执行命令。
 
 ## 适用与不适用场景分析
 
