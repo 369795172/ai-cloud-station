@@ -4,8 +4,6 @@
 
 **ai-cloud-station** 是一套面向全球协作团队的 AI 云端开发环境一键部署解决方案。通过 Docker 容器化技术，将顶级 AI 编码工具（如 Anon Kode、Claude Code、OpenAI Codex、Devin 等）和现代开发环境集成在一起，帮助团队成员无论身处何地，都能安全、稳定、高效地使用最强 AI 编码能力。
 
-> **注**：Anon Kode 是 Claude Code 的开源替代品，提供类似的交互式 AI 体验，但其版本可能落后于官方约两个月，适合作为基础功能的免费平替。
-
 ### 主要特性
 
 - **Miniconda 集成**: 预装 Miniconda 并激活 base 环境作为系统默认 Python，Poetry 也基于 conda 环境安装，提供完整的 Python 科学计算生态。
