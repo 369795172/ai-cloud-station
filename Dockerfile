@@ -6,9 +6,22 @@ RUN apt-get update && apt-get install -y \
     curl sudo wget git vim net-tools gnupg ca-certificates \
     xfce4 xfce4-goodies tigervnc-standalone-server novnc websockify \
     openssh-server \
-    python3.10 python3-pip python3.10-venv \
     build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# 安装 Miniconda
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    bash /tmp/miniconda.sh -b -p /opt/miniconda3 && \
+    rm /tmp/miniconda.sh && \
+    /opt/miniconda3/bin/conda init bash && \
+    /opt/miniconda3/bin/conda config --set auto_activate_base true
+
+# 设置 Miniconda 环境变量，使其成为系统默认 Python
+ENV PATH="/opt/miniconda3/bin:${PATH}"
+ENV CONDA_DEFAULT_ENV=base
+
+# 在 base 环境中安装 Poetry
+RUN /opt/miniconda3/bin/pip install poetry
 
 # 创建 dev 用户
 RUN useradd -m -s /bin/bash dev && \
@@ -35,9 +48,9 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 USER dev
 WORKDIR /home/dev/workspace
 
-# 安装 Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
-ENV PATH="/home/dev/.local/bin:${PATH}"
+# 确保 dev 用户也能使用 miniconda
+RUN echo 'export PATH="/opt/miniconda3/bin:$PATH"' >> /home/dev/.bashrc && \
+    echo 'conda activate base' >> /home/dev/.bashrc
 
 EXPOSE 22 5901 6080 8080
 

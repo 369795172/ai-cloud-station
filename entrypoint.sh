@@ -3,6 +3,12 @@ set -e
 
 # --- 1. 从环境变量中获取统一密码，并设置给新用户 'dev' ---
 USER_PASSWORD=${PASSWORD:-"DefaultPasswordPleaseChange"}
+
+# --- 1.1 从环境变量中获取端口配置 ---
+SSH_PORT=${SSH_PORT:-22}
+VSCODE_PORT=${VSCODE_PORT:-8080}
+VNC_PORT=${VNC_PORT:-6080}
+VNC_DISPLAY_PORT=${VNC_DISPLAY_PORT:-5901}
 # 使用 sudo 来更改 'dev' 用户的密码
 echo "dev:$USER_PASSWORD" | sudo chpasswd
 echo "✅ User 'dev' password set."
@@ -76,30 +82,32 @@ EOF
 fi
 
 # --- 2. 使用sudo启动需要root权限的核心服务 ---
+# 配置 SSH 端口
+sudo sed -i "s/^#*Port .*/Port $SSH_PORT/" /etc/ssh/sshd_config
 sudo /etc/init.d/ssh start
-echo "✅ SSH server started."
+echo "✅ SSH server started on port $SSH_PORT."
 
 # --- 3. 以 'dev' 用户身份，在用户主目录中配置并启动桌面和Web IDE ---
 # 设置 VNC 密码并启动 VNC (路径修改为 /home/dev)
 mkdir -p /home/dev/.vnc
 echo "$USER_PASSWORD" | vncpasswd -f > /home/dev/.vnc/passwd
 chmod 600 /home/dev/.vnc/passwd
-vncserver :1 -geometry 1280x800 -rfbport 5901 -localhost no
-echo "✅ VNC server started."
+vncserver :1 -geometry 1280x800 -rfbport $VNC_DISPLAY_PORT -localhost no
+echo "✅ VNC server started on port $VNC_DISPLAY_PORT."
 
 # 启动 noVNC (Web VNC 客户端)
-websockify --web=/usr/share/novnc/ 6080 localhost:5901 &
-echo "✅ noVNC (Web VNC client) started."
+websockify --web=/usr/share/novnc/ $VNC_PORT localhost:$VNC_DISPLAY_PORT &
+echo "✅ noVNC (Web VNC client) started on port $VNC_PORT."
 
 # 启动 code-server (Web IDE)，并默认打开工作区
 # 所有路径都指向 /home/dev/workspace 下的持久化目录
 PASSWORD="$USER_PASSWORD" /usr/bin/code-server \
-    --bind-addr 0.0.0.0:8080 \
+    --bind-addr 0.0.0.0:$VSCODE_PORT \
     --auth password \
     --user-data-dir /workspace/.vscode-server \
     --extensions-dir /workspace/.vscode-server/extensions \
     /home/dev/workspace &
-echo "✅ code-server (Web IDE) started."
+echo "✅ code-server (Web IDE) started on port $VSCODE_PORT."
 
 # --- 1.6 修复 Claude 配置目录权限 ---
 CLAUDE_DIR="/home/dev/.claude"
