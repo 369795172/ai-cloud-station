@@ -92,8 +92,10 @@ echo "✅ SSH server started on port $SSH_PORT."
 mkdir -p /home/dev/.vnc
 echo "$USER_PASSWORD" | vncpasswd -f > /home/dev/.vnc/passwd
 chmod 600 /home/dev/.vnc/passwd
-vncserver :1 -geometry 1280x800 -rfbport $VNC_DISPLAY_PORT -localhost no
-echo "✅ VNC server started on port $VNC_DISPLAY_PORT."
+# 计算VNC显示号（基于端口基数）
+VNC_DISPLAY_NUM=${PORT_BASE:-1}
+vncserver :$VNC_DISPLAY_NUM -geometry 1280x800 -rfbport $VNC_DISPLAY_PORT -localhost no
+echo "✅ VNC server started on display :$VNC_DISPLAY_NUM, port $VNC_DISPLAY_PORT."
 
 # 启动 noVNC (Web VNC 客户端)
 websockify --web=/usr/share/novnc/ $VNC_PORT localhost:$VNC_DISPLAY_PORT &
@@ -101,6 +103,7 @@ echo "✅ noVNC (Web VNC client) started on port $VNC_PORT."
 
 # 启动 code-server (Web IDE)，并默认打开工作区
 # 所有路径都指向 /home/dev/workspace 下的持久化目录
+# 确保使用conda环境中的Python
 PASSWORD="$USER_PASSWORD" /usr/bin/code-server \
     --bind-addr 0.0.0.0:$VSCODE_PORT \
     --auth password \

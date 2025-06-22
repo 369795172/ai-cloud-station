@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
     bash /tmp/miniconda.sh -b -p /opt/miniconda3 && \
     rm /tmp/miniconda.sh && \
-    /opt/miniconda3/bin/conda init bash && \
-    /opt/miniconda3/bin/conda config --set auto_activate_base true
+    /opt/miniconda3/bin/conda config --set auto_activate_base true && \
+    /opt/miniconda3/bin/conda install -y python=3.10
 
 # 设置 Miniconda 环境变量，使其成为系统默认 Python
 ENV PATH="/opt/miniconda3/bin:${PATH}"
@@ -22,6 +22,10 @@ ENV CONDA_DEFAULT_ENV=base
 
 # 在 base 环境中安装 Poetry
 RUN /opt/miniconda3/bin/pip install poetry
+
+# 为所有用户配置 conda
+RUN echo 'eval "$(/opt/miniconda3/bin/conda shell.bash hook)"' >> /etc/bash.bashrc && \
+    echo 'conda activate base' >> /etc/bash.bashrc
 
 # 创建 dev 用户
 RUN useradd -m -s /bin/bash dev && \
@@ -48,9 +52,11 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 USER dev
 WORKDIR /home/dev/workspace
 
-# 确保 dev 用户也能使用 miniconda
-RUN echo 'export PATH="/opt/miniconda3/bin:$PATH"' >> /home/dev/.bashrc && \
-    echo 'conda activate base' >> /home/dev/.bashrc
+# 确保 dev 用户也能使用 miniconda，并设置正确的初始化
+RUN echo '# >>> conda initialize >>>' >> /home/dev/.bashrc && \
+    echo 'eval "$(/opt/miniconda3/bin/conda shell.bash hook)"' >> /home/dev/.bashrc && \
+    echo 'conda activate base' >> /home/dev/.bashrc && \
+    echo '# <<< conda initialize <<<' >> /home/dev/.bashrc
 
 EXPOSE 22 5901 6080 8080
 
