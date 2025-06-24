@@ -50,13 +50,12 @@ chmod +x deploy_user.sh
 ./deploy_user.sh 用户名 端口基数
 
 # 指定资源限制
-./deploy_user.sh 用户名 端口基数 --cpu 4 --memory 16g
+./deploy_user.sh 用户名 端口基数 --cpu 16 --memory 128g
 
 # 示例
 ./deploy_user.sh xinlu 10                      # 端口: 1022(SSH), 1080(VS Code), 1081(VNC)
 ./deploy_user.sh alice 20 --cpu 2              # 端口: 2022, 2080, 2081, 限制2核CPU
 ./deploy_user.sh bob 30 --memory 8g            # 端口: 3022, 3080, 3081, 限制8GB内存
-./deploy_user.sh charlie 40 --cpu 4 --memory 16g  # 端口: 4022, 4080, 4081, 同时限制资源
 ```
 - **端口基数**：两位数字，用于生成唯一端口号，避免容器间冲突
 - 脚本会自动生成随机密码、初始化持久化目录、同步AI认证
