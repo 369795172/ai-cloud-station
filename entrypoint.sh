@@ -40,14 +40,17 @@ if [ ! -f "$README_FILE" ]; then
 您正在使用基于 Docker 构建的 **AI 编码 3.0** 环境。
 
 ## 快速提示
-1. **全自动执行 Claude Code Agent**  
-   在 VS Code 终端或 SSH 中执行：
+1. **AI 助手工具**  
+   在 VS Code 终端或 SSH 中使用：
    ```bash
+   # Claude Code Agent（全自动模式）
    claude --dangerously-skip-permissions
-   # 或使用简化别名
-   yolo
+   yolo  # 简化别名
+   
+   # Google Gemini CLI
+   gemini  # 交互式AI助手
    ```
-   该模式下，AI 可以无需人工确认直接执行命令，请谨慎使用。
+   yolo模式下，AI 可以无需人工确认直接执行命令，请谨慎使用。
 2. 如果在线IDE个别扩展功能不正常（又非常想用的情况下），请配置反向代理 + 域名 + SSL，并通过"https://域名"访问在线IDE，具体可以问问claude是怎么配的
 
 ## 预装工具 (常见版本)
@@ -64,6 +67,7 @@ if [ ! -f "$README_FILE" ]; then
 | code-server | 最新 | VS Code Web 版 |
 | xfce4 / TigerVNC / noVNC | 最新 | 远程桌面环境 |
 | **Claude CLI** | 最新 | `@anthropic-ai/claude-code`，别名 `yolo` |
+| **Gemini CLI** | 最新 | `@google/gemini-cli`，Google AI 助手 |
 | **uv** | 最新 | Rust 实现的极速 Python 包管理器 |
 | Git / Vim / curl / build-essential | - | 常用开发工具 |
 

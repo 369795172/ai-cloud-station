@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-**ai-cloud-station** 是一套面向全球协作团队的 AI 云端开发环境一键部署解决方案。通过 Docker 容器化技术，将顶级 AI 编码工具（如 Anon Kode、Claude Code、OpenAI Codex、Devin 等）和现代开发环境集成在一起，帮助团队成员无论身处何地，都能安全、稳定、高效地使用最强 AI 编码能力。
+**ai-cloud-station** 是一套面向全球协作团队的 AI 云端开发环境一键部署解决方案。通过 Docker 容器化技术，将顶级 AI 编码工具（如 Claude Code、Gemini CLI、OpenAI Codex、Devin 等）和现代开发环境集成在一起，帮助团队成员无论身处何地，都能安全、稳定、高效地使用最强 AI 编码能力。
 
 ### 主要特性
 
@@ -150,8 +150,10 @@ A：容器使用系统级 Python 3.12，`python` 命令已指向 `python3`。预
 **Q7：容器内服务如何被外部访问？**  
 A：由于使用主机网络模式，容器内启动的任何服务都可以通过主机 IP 直接访问，无需额外的端口映射配置。
 
-**Q8：如何快速启用 AI 全自动执行模式？**  
-A：容器内置了 `yolo` 别名，直接输入 `yolo` 即可启用 `claude --dangerously-skip-permissions` 模式，AI 可以无需人工确认直接执行命令。
+**Q8：如何使用 AI 助手工具？**  
+A：容器预装了多个AI助手：
+- `yolo` 或 `claude --dangerously-skip-permissions` - Claude全自动执行模式
+- `gemini` - Google Gemini交互式AI助手，支持最多60次/分钟，1000次/天的免费请求
 
 ## 适用与不适用场景分析
 

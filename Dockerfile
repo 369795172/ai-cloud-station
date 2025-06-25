@@ -41,7 +41,7 @@ RUN sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ss
 # 安装 Node.js、全局工具（移除anon-kode）
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update && apt-get install -y nodejs \
-    && npm install -g pnpm playwright @anthropic-ai/claude-code
+    && npm install -g pnpm playwright @anthropic-ai/claude-code @google/gemini-cli
 
 # 安装 Playwright 浏览器依赖和 code-server
 RUN playwright install-deps && playwright install chrome
