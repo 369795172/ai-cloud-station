@@ -9,7 +9,7 @@
 - **Python 3.12 系统级集成**: 使用系统级 Python 3.12，`python` 命令直接指向 `python3`，Poetry 和 uv 预装，环境更加简洁稳定。
 - **主机网络模式**: 容器与主机共享网络命名空间，可直接暴露任意端口，支持 WebSocket、HTTP 等所有协议的透传访问。
 - **灵活资源控制**: 支持通过 `--cpu` 和 `--memory` 参数精确控制容器资源，不指定时默认不限制。
-- **便捷别名**: 内置 `yolo` 别名，等价于 `claude --dangerously-skip-permissions`，一键启用 AI 全自动执行模式。
+- **便捷别名**: 内置 `yolo` (Claude) 和 `gyolo` (Gemini) 别名，一键启用 AI 全自动执行模式。
 
 ## 核心价值
 
@@ -151,8 +151,9 @@ A：容器使用系统级 Python 3.12，`python` 命令已指向 `python3`。预
 A：由于使用主机网络模式，容器内启动的任何服务都可以通过主机 IP 直接访问，无需额外的端口映射配置。
 
 **Q8：如何使用 AI 助手工具？**  
-A：容器预装了多个AI助手：
-- `yolo` 或 `claude --dangerously-skip-permissions` - Claude全自动执行模式
+A：容器预装了多个AI助手和快捷别名：
+- `yolo` - Claude全自动执行模式（等价于 `claude --dangerously-skip-permissions`）
+- `gyolo` - Gemini全自动执行模式（等价于 `gemini --yolo`）
 - `gemini` - Google Gemini交互式AI助手，支持最多60次/分钟，1000次/天的免费请求
 
 ## 适用与不适用场景分析

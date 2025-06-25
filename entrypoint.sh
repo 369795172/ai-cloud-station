@@ -43,14 +43,16 @@ if [ ! -f "$README_FILE" ]; then
 1. **AI 助手工具**  
    在 VS Code 终端或 SSH 中使用：
    ```bash
-   # Claude Code Agent（全自动模式）
+   # Claude Code Agent
    claude --dangerously-skip-permissions
-   yolo  # 简化别名
+   yolo    # Claude全自动模式简化别名
    
    # Google Gemini CLI
-   gemini  # 交互式AI助手
+   gemini           # 交互式AI助手
+   gemini --yolo    # Gemini全自动模式
+   gyolo           # Gemini全自动模式简化别名
    ```
-   yolo模式下，AI 可以无需人工确认直接执行命令，请谨慎使用。
+   yolo/gyolo模式下，AI 可以无需人工确认直接执行命令，请谨慎使用。
 2. 如果在线IDE个别扩展功能不正常（又非常想用的情况下），请配置反向代理 + 域名 + SSL，并通过"https://域名"访问在线IDE，具体可以问问claude是怎么配的
 
 ## 预装工具 (常见版本)

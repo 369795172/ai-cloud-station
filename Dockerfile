@@ -52,14 +52,16 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # 添加系统级别名
-RUN echo 'alias yolo="claude --dangerously-skip-permissions"' >> /etc/bash.bashrc
+RUN echo 'alias yolo="claude --dangerously-skip-permissions"' >> /etc/bash.bashrc && \
+    echo 'alias gyolo="gemini --yolo"' >> /etc/bash.bashrc
 
 USER dev
 WORKDIR /home/dev/workspace
 
-# 为dev用户设置Poetry、uv路径和yolo别名
+# 为dev用户设置Poetry、uv路径和AI别名
 RUN echo 'export PATH="/root/.local/bin:/root/.cargo/bin:$PATH"' >> /home/dev/.bashrc && \
     echo 'alias yolo="claude --dangerously-skip-permissions"' >> /home/dev/.bashrc && \
+    echo 'alias gyolo="gemini --yolo"' >> /home/dev/.bashrc && \
     echo 'export PATH="/home/dev/.local/bin:$PATH"' >> /home/dev/.bashrc
 
 EXPOSE 22 5901 6080 8080
