@@ -58,7 +58,7 @@ if [ ! -f "$README_FILE" ]; then
 | OpenSSH Server | 最新 | 方便远程 SSH 登录 |
 | **Node.js** | 22.x | 由 NodeSource 仓库安装 |
 | pnpm | 最新 | 全局包管理器 |
-| **Python** | 3.10 | 系统级 Python 3.10，python 命令已指向 python3 |
+| **Python** | 3.12 | 系统级 Python 3.12，python 命令已指向 python3 |
 | Poetry | 最新 | 现代化 Python 依赖管理 |
 | **Playwright** | 最新 | 以及 `chrome` 浏览器依赖 |
 | code-server | 最新 | VS Code Web 版 |
