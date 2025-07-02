@@ -10,25 +10,19 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 添加deadsnakes PPA并安装Python 3.12
-RUN add-apt-repository ppa:deadsnakes/ppa -y && \
-    apt-get update && \
-    apt-get install -y python3.12 python3.12-dev python3.12-venv python3.12-distutils && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# 安装 Miniconda (Python 3.10)
+RUN curl -sSLo /tmp/miniconda.sh "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.2-0-Linux-x86_64.sh" && \
+    bash /tmp/miniconda.sh -b -p /opt/miniconda && \
+    rm /tmp/miniconda.sh
+ENV PATH="/opt/miniconda/bin:${PATH}"
 
-# 设置python和python3命令指向python3.12
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 && \
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+# 安装 Poetry 和 uv
+RUN python -m pip install poetry && \
+    curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    mv /root/.local/bin/uv /usr/local/bin/uv
 
-# 安装pip for Python 3.12
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
-
-# 安装Poetry和uv到系统Python
-RUN pip install poetry && \
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 设置全局PATH包含poetry和uv
-ENV PATH="/root/.local/bin:/root/.cargo/bin:${PATH}"
+# 设置全局PATH
+ENV PATH="/root/.local/bin:${PATH}"
 
 # 创建 dev 用户
 RUN useradd -m -s /bin/bash dev && \
@@ -38,8 +32,8 @@ RUN useradd -m -s /bin/bash dev && \
 # 配置 SSH
 RUN sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
-# 安装 Node.js、全局工具（移除anon-kode）
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+# 安装 Node.js 和全局工具
+RUN curl -fsSL https://deb.nodesource.com/setup_23.x | bash - \
     && apt-get update && apt-get install -y nodejs \
     && npm install -g pnpm playwright @anthropic-ai/claude-code @google/gemini-cli
 
@@ -58,11 +52,13 @@ RUN echo 'alias yolo="claude --dangerously-skip-permissions"' >> /etc/bash.bashr
 USER dev
 WORKDIR /home/dev/workspace
 
-# 为dev用户设置Poetry、uv路径和AI别名
-RUN echo 'export PATH="/root/.local/bin:/root/.cargo/bin:$PATH"' >> /home/dev/.bashrc && \
+# 为dev用户设置环境
+RUN echo 'export PATH="/opt/miniconda/bin:/root/.local/bin:/root/.cargo/bin:$PATH"' >> /home/dev/.bashrc && \
     echo 'alias yolo="claude --dangerously-skip-permissions"' >> /home/dev/.bashrc && \
     echo 'alias gyolo="gemini --yolo"' >> /home/dev/.bashrc && \
-    echo 'export PATH="/home/dev/.local/bin:$PATH"' >> /home/dev/.bashrc
+    echo 'export PATH="/home/dev/.local/bin:$PATH"' >> /home/dev/.bashrc && \
+    /opt/miniconda/bin/conda init bash && \
+    echo 'conda activate base' >> /home/dev/.bashrc
 
 EXPOSE 22 5901 6080 8080
 

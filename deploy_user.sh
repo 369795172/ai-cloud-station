@@ -1,14 +1,11 @@
 #!/bin/bash
-# Filename: deploy_user.sh
-# Description: Deploys a standardized AI development environment for a user.
+# Deploys a standardized AI development environment for a user.
 
-# --- 参数处理 ---
 USER_NAME=""
 PORT_BASE=""
 CPUS=""
 MEMORY=""
 
-# 解析命令行参数
 while [[ $# -gt 0 ]]; do
     case $1 in
         --cpu)
@@ -33,7 +30,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# 参数校验
 if [[ -z "$USER_NAME" || -z "$PORT_BASE" ]]; then
     echo "用法: ./deploy_user.sh <用户名> <端口基数> [选项]"
     echo "      <用户名>     - 用于命名容器和目录，例如: xinlu"
@@ -51,16 +47,13 @@ if [[ -z "$USER_NAME" || -z "$PORT_BASE" ]]; then
     exit 1
 fi
 
-# --- 自动生成唯一的强密码 (16位，仅字母和数字) ---
 USER_PASSWORD=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 16)
 DATA_DIR="/srv/user-data/$USER_NAME"
 
-# --- 为用户准备持久化目录和独立的AI认证 ---
 echo "正在为用户 $USER_NAME 准备目录: $DATA_DIR"
 sudo mkdir -p "$DATA_DIR/workspace"
 sudo chown -R 1000:1000 "$DATA_DIR/workspace"
 
-# 关键步骤：将主机的Claude配置"复制"一份给用户
 echo "正在为用户 $USER_NAME 创建独立的AI工具配置..."
 if [ -d "/root/.claude" ] && [ -f "/root/.claude.json" ]; then
     sudo cp -r /root/.claude "$DATA_DIR/.claude"
@@ -68,13 +61,11 @@ if [ -d "/root/.claude" ] && [ -f "/root/.claude.json" ]; then
     sudo chown -R 1000:1000 "$DATA_DIR/.claude"
     sudo chown 1000:1000 "$DATA_DIR/.claude.json"
 else
-    echo "警告: 未在主机 /root/ 目录下找到Claude配置，容器内可能无法使用。"
+    echo "警告: 未在主机 /root/ 目录下找到Claude配置��容器内可能无法使用。"
 fi
 
-# --- 构建docker run命令 ---
 DOCKER_CMD="docker run -d --name ai-dev-$USER_NAME --restart always --network host"
 
-# 添加资源限制（如果指定了）
 if [[ -n "$CPUS" ]]; then
     DOCKER_CMD="$DOCKER_CMD --cpus=$CPUS"
 fi
@@ -82,7 +73,6 @@ if [[ -n "$MEMORY" ]]; then
     DOCKER_CMD="$DOCKER_CMD --memory=$MEMORY"
 fi
 
-# 添加卷挂载和环境变量
 DOCKER_CMD="$DOCKER_CMD -v $DATA_DIR/workspace:/home/dev/workspace"
 DOCKER_CMD="$DOCKER_CMD -v $DATA_DIR/.claude:/home/dev/.claude"
 DOCKER_CMD="$DOCKER_CMD -v $DATA_DIR/.claude.json:/home/dev/.claude.json"
@@ -94,7 +84,6 @@ DOCKER_CMD="$DOCKER_CMD -e VNC_DISPLAY_PORT=59${PORT_BASE}"
 DOCKER_CMD="$DOCKER_CMD -e PORT_BASE=${PORT_BASE}"
 DOCKER_CMD="$DOCKER_CMD ai-dev-env:latest"
 
-# --- 部署容器 ---
 echo "正在为用户 $USER_NAME 部署容器..."
 DOCKER_OUTPUT=$($DOCKER_CMD 2>&1)
 DOCKER_STATUS=$?

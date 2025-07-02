@@ -1,5 +1,4 @@
 #!/bin/bash
-# Filename: resync_auth.sh
 
 echo "开始同步最新的 Claude 认证信息..."
 
@@ -23,3 +22,11 @@ for user_dir in "$USER_DATA_ROOT"/*; do
 done
 
 echo "✅ 所有用户的 Claude 认证信息已同步至最新！"
+echo "--------------------------------------------------"
+echo "重要提示："
+echo "正在运行的容器需要重启才能应用新的认证信息。"
+echo "您可以使用以下命令逐一重启所有用户的容器："
+echo ""
+echo "docker ps -q --filter 'name=ai-dev-*' | xargs -r -n 1 docker restart"
+echo ""
+echo "--------------------------------------------------"
