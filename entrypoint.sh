@@ -55,7 +55,7 @@ if [ ! -f "$README_FILE" ]; then
 | OpenSSH Server | 最新 | 方便远程 SSH 登录 |
 | **Node.js** | 23.x | 由 NodeSource 仓库安装 |
 | pnpm | 最新 | 全局包管理器 |
-| **Python** | 3.10 | 由 Miniconda 提供 |
+| **Python** | 3.12 | 系统级安装 |
 | Poetry | 最新 | 现代化 Python 依赖管理 |
 | **Playwright** | 最新 | 以及 `chrome` 浏览器依赖 |
 | code-server | 最新 | VS Code Web 版 |
@@ -80,10 +80,14 @@ EOF
     sudo chown dev:dev "$README_FILE"
 fi
 
+# 配置 SSH 服务
 sudo sed -i "s/^#*Port .*/Port $SSH_PORT/" /etc/ssh/sshd_config
+# 确保 SSH 监听所有接口
+sudo sed -i "s/^#*ListenAddress .*/ListenAddress 0.0.0.0/" /etc/ssh/sshd_config
 sudo /etc/init.d/ssh start
 echo "✅ SSH server started on port $SSH_PORT."
 
+# 设置 VNC
 mkdir -p /home/dev/.vnc
 echo "$USER_PASSWORD" | vncpasswd -f > /home/dev/.vnc/passwd
 chmod 600 /home/dev/.vnc/passwd
@@ -91,9 +95,11 @@ VNC_DISPLAY_NUM=${PORT_BASE:-1}
 vncserver :$VNC_DISPLAY_NUM -geometry 1280x800 -rfbport $VNC_DISPLAY_PORT -localhost no
 echo "✅ VNC server started on display :$VNC_DISPLAY_NUM, port $VNC_DISPLAY_PORT."
 
-websockify --web=/usr/share/novnc/ $VNC_PORT localhost:$VNC_DISPLAY_PORT &
+# 启动 noVNC
+websockify --web=/usr/share/novnc/ -v $VNC_PORT 0.0.0.0:$VNC_DISPLAY_PORT &
 echo "✅ noVNC (Web VNC client) started on port $VNC_PORT."
 
+# 启动 VS Code Server
 PASSWORD="$USER_PASSWORD" /usr/bin/code-server \
     --bind-addr 0.0.0.0:$VSCODE_PORT \
     --auth password \
@@ -102,6 +108,7 @@ PASSWORD="$USER_PASSWORD" /usr/bin/code-server \
     /home/dev/workspace &
 echo "✅ code-server (Web IDE) started on port $VSCODE_PORT."
 
+# 设置 Claude 权限
 CLAUDE_DIR="/home/dev/.claude"
 CLAUDE_FILE="/home/dev/.claude.json"
 if [ -e "$CLAUDE_DIR" ]; then

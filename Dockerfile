@@ -10,14 +10,16 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 安装 Miniconda (Python 3.10)
-RUN curl -sSLo /tmp/miniconda.sh "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.2-0-Linux-x86_64.sh" && \
-    bash /tmp/miniconda.sh -b -p /opt/miniconda && \
-    rm /tmp/miniconda.sh
-ENV PATH="/opt/miniconda/bin:${PATH}"
+# 安装 Python 3.12 (系统级)
+RUN add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update && \
+    apt-get install -y python3.12 python3.12-venv python3.12-dev python3-pip && \
+    ln -sf /usr/bin/python3.12 /usr/bin/python && \
+    ln -sf /usr/bin/python3.12 /usr/bin/python3 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 安装 Poetry 和 uv
-RUN python -m pip install poetry && \
+RUN curl -sSL https://install.python-poetry.org | python - && \
     curl -LsSf https://astral.sh/uv/install.sh | sh && \
     mv /root/.local/bin/uv /usr/local/bin/uv
 
@@ -30,7 +32,8 @@ RUN useradd -m -s /bin/bash dev && \
     echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # 配置 SSH
-RUN sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    ssh-keygen -A
 
 # 安装 Node.js 和全局工具
 RUN curl -fsSL https://deb.nodesource.com/setup_23.x | bash - \
@@ -38,7 +41,14 @@ RUN curl -fsSL https://deb.nodesource.com/setup_23.x | bash - \
     && npm install -g pnpm playwright @anthropic-ai/claude-code @google/gemini-cli
 
 # 安装 Playwright 浏览器依赖和 code-server
-RUN playwright install-deps && playwright install chrome
+RUN playwright install-deps && \
+    arch=$(arch) && \
+    if [ "$arch" = "aarch64" ]; then \
+        # arm64 没有 chrome，用官方 Chromium/Firefox/WebKit 即可
+        playwright install chromium; \
+    else \
+        playwright install chrome; \
+    fi
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # 复制入口脚本
@@ -53,12 +63,10 @@ USER dev
 WORKDIR /home/dev/workspace
 
 # 为dev用户设置环境
-RUN echo 'export PATH="/opt/miniconda/bin:/root/.local/bin:/root/.cargo/bin:$PATH"' >> /home/dev/.bashrc && \
+RUN echo 'export PATH="/root/.local/bin:/root/.cargo/bin:$PATH"' >> /home/dev/.bashrc && \
     echo 'alias yolo="claude --dangerously-skip-permissions"' >> /home/dev/.bashrc && \
     echo 'alias gyolo="gemini --yolo"' >> /home/dev/.bashrc && \
-    echo 'export PATH="/home/dev/.local/bin:$PATH"' >> /home/dev/.bashrc && \
-    /opt/miniconda/bin/conda init bash && \
-    echo 'conda activate base' >> /home/dev/.bashrc
+    echo 'export PATH="/home/dev/.local/bin:$PATH"' >> /home/dev/.bashrc
 
 EXPOSE 22 5901 6080 8080
 
