@@ -1,6 +1,10 @@
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
+# 配置国内镜像源以提高下载速度
+RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && \
+    sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+
 # 安装核心依赖
 RUN apt-get update && apt-get install -y \
     curl sudo wget git vim net-tools gnupg ca-certificates \

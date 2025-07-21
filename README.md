@@ -35,13 +35,64 @@ git clone https://github.com/shareAI-Lab/ai-cloud-station.git
 cd ai-cloud-station
 ```
 
-### 2. 构建标准化开发镜像
+### 2. 配置Docker镜像加速器（推荐）
+
+#### Windows/macOS用户配置Docker Desktop
+
+1. 在系统托盘图标内右键菜单选择 **Settings**
+2. 打开配置窗口后左侧导航菜单选择 **Docker Engine**
+3. 编辑窗口内的JSON配置，添加阿里云镜像加速器地址：
+
+```json
+{
+  "registry-mirrors": [
+    "https://[你的专属ID].mirror.aliyuncs.com"
+  ]
+}
+```
+
+4. 点击 **Apply & Restart** 保存并重启Docker
+
+> **获取专属加速器地址**：
+> 1. 访问 [阿里云容器镜像服务控制台](https://cr.console.aliyun.com/ap-southeast-1/instances/mirrors)
+> 2. 登录阿里云账号
+> 3. 复制专属的镜像加速器地址（格式：`https://[专属ID].mirror.aliyuncs.com`）
+
+#### Linux用户配置
 
 ```bash
+# 创建或编辑Docker配置文件
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://[你的专属ID].mirror.aliyuncs.com"
+  ]
+}
+EOF
+
+# 重启Docker服务
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+### 3. 构建标准化开发镜像
+
+```bash
+# Windows用户
+docker build -t ai-dev-env:latest .
+
+# Linux/macOS用户
 sudo docker build -t ai-dev-env:latest .
 ```
 
-### 3. 为每位成员一键部署专属环境
+> **构建优化提示**：
+> - 项目已内置国内镜像源配置，提高Ubuntu软件包下载速度
+> - 首次构建可能需要10-20分钟，请耐心等待
+> - 如遇到网络问题，建议配置Docker镜像加速器
+> - 构建过程中会自动安装Python 3.12、Node.js、开发工具等完整环境
+
+### 4. 为每位成员一键部署专属环境
 
 ```bash
 chmod +x deploy_user.sh
@@ -63,14 +114,14 @@ chmod +x deploy_user.sh
 - 不指定资源限制时，容器可使用主机全部资源
 - 脚本执行成功后，会输出所有访问方式和凭证
 
-### 4. 认证同步/批量维护（如有需要）
+### 5. 认证同步/批量维护（如有需要）
 
 ```bash
 chmod +x resync_auth.sh
 ./resync_auth.sh
 ```
 
-### 5. 访问方式
+### 6. 访问方式
 
 容器使用主机网络模式，服务端口基于端口基数分配：
 
@@ -129,28 +180,36 @@ chmod +x resync_auth.sh
 
 ## 常见问题（FAQ）
 
-**Q1：如何批量为团队成员分配环境？**  
+**Q1：Docker构建失败怎么办？**  
+A：常见原因和解决方案：
+- **网络问题**：配置Docker镜像加速器，参考快速开始第2步
+- **软件源问题**：项目已内置国内镜像源配置，如仍有问题可尝试更换其他镜像源
+- **内存不足**：确保Docker有足够内存（建议8GB以上）
+- **磁盘空间不足**：清理Docker缓存 `docker system prune -a`
+- **镜像加速器配置错误**：确保使用正确的专属加速器地址格式
+
+**Q2：如何批量为团队成员分配环境？**  
 A：可编写简单的 shell 脚本循环调用 `deploy_user.sh`，或结合 CI/CD 工具实现自动化。
 
-**Q2：Claude 认证失效怎么办？**  
+**Q3：Claude 认证失效怎么办？**  
 A：管理员在主机上重新登录 Claude 后，运行 `resync_auth.sh` 即可一键同步，无需重启容器。
 
-**Q3：如何实现 HTTPS/子域名访问？**  
+**Q4：如何实现 HTTPS/子域名访问？**  
 A：推荐在主机部署 Nginx/Traefik 反向代理，为每位成员分配独立子域名并配置 SSL 证书。
 
-**Q4：如何扩展更多 AI 工具或自定义开发环境？**  
+**Q5：如何扩展更多 AI 工具或自定义开发环境？**  
 A：可直接修改 Dockerfile，添加所需依赖和工具，重建镜像即可。
 
-**Q5：多个容器使用主机网络模式时端口冲突怎么办？**  
+**Q6：多个容器使用主机网络模式时端口冲突怎么办？**  
 A：项目已通过端口基数机制解决此问题。每个用户使用不同的端口基数（如10、20、30），容器会自动使用对应的端口范围，避免冲突。
 
-**Q6：如何使用 Python 环境？**  
+**Q7：如何使用 Python 环境？**  
 A：容器使用系统级 Python 3.12，`python` 命令已指向 `python3`。预装了 `pip`、`poetry` 和 `uv` 包管理器，支持虚拟环境创建。
 
-**Q7：容器内服务如何被外部访问？**  
+**Q8：容器内服务如何被外部访问？**  
 A：由于使用主机网络模式，容器内启动的任何服务都可以通过主机 IP 直接访问，无需额外的端口映射配置。
 
-**Q8：如何使用 AI 助手工具？**  
+**Q9：如何使用 AI 助手工具？**  
 A：容器预装了多个AI助手和快捷别名：
 - `yolo` - Claude全自动执行模式（等价于 `claude --dangerously-skip-permissions`）
 - `gyolo` - Gemini全自动执行模式（等价于 `gemini --yolo`）
