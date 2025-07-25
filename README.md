@@ -31,7 +31,7 @@
 ### 1. 克隆仓库
 
 ```bash
-git clone https://github.com/shareAI-Lab/ai-cloud-station.git
+git clone https://github.com/369795172/ai-cloud-station.git
 cd ai-cloud-station
 ```
 

@@ -90,6 +90,11 @@ if [ "$OS_TYPE" = "Darwin" ]; then
         echo "警告: 未在 $HOME 目录下找到Claude配置，容器内可能无法使用。"
         # 创建空目录以避免挂载错误
         mkdir -p "$DATA_DIR/.claude"
+        # 确保 .claude.json 是文件而不是目录
+        if [ -d "$DATA_DIR/.claude.json" ]; then
+            echo "发现 $DATA_DIR/.claude.json 是目录，正在删除并重新创建为文件..."
+            rm -rf "$DATA_DIR/.claude.json"
+        fi
         touch "$DATA_DIR/.claude.json"
     fi
 else
@@ -103,6 +108,11 @@ else
         echo "警告: 未在主机 /root/ 目录下找到Claude配置，容器内可能无法使用。"
         # 创建空目录以避免挂载错误
         sudo mkdir -p "$DATA_DIR/.claude"
+        # 确保 .claude.json 是文件而不是目录
+        if [ -d "$DATA_DIR/.claude.json" ]; then
+            echo "发现 $DATA_DIR/.claude.json 是目录，正在删除并重新创建为文件..."
+            sudo rm -rf "$DATA_DIR/.claude.json"
+        fi
         sudo touch "$DATA_DIR/.claude.json"
         sudo chown -R 1000:1000 "$DATA_DIR/.claude"
         sudo chown 1000:1000 "$DATA_DIR/.claude.json"
@@ -131,9 +141,9 @@ DOCKER_CMD="$DOCKER_CMD -v $DATA_DIR/workspace:/home/dev/workspace"
 DOCKER_CMD="$DOCKER_CMD -v $DATA_DIR/.claude:/home/dev/.claude"
 DOCKER_CMD="$DOCKER_CMD -v $DATA_DIR/.claude.json:/home/dev/.claude.json"
 DOCKER_CMD="$DOCKER_CMD -e PASSWORD=$USER_PASSWORD"
-DOCKER_CMD="$DOCKER_CMD -e SSH_PORT=22"
-DOCKER_CMD="$DOCKER_CMD -e VSCODE_PORT=8080"
-DOCKER_CMD="$DOCKER_CMD -e VNC_PORT=6080"
+DOCKER_CMD="$DOCKER_CMD -e SSH_PORT=${PORT_BASE}22"
+DOCKER_CMD="$DOCKER_CMD -e VSCODE_PORT=${PORT_BASE}80"
+DOCKER_CMD="$DOCKER_CMD -e VNC_PORT=${PORT_BASE}81"
 DOCKER_CMD="$DOCKER_CMD -e VNC_DISPLAY_PORT=5901"
 DOCKER_CMD="$DOCKER_CMD -e PORT_BASE=${PORT_BASE}"
 DOCKER_CMD="$DOCKER_CMD ai-dev-env:latest"
