@@ -115,6 +115,13 @@ if [ -e "$CLAUDE_DIR" ]; then
     sudo chown -R dev:dev "$CLAUDE_DIR"
 fi
 if [ -e "$CLAUDE_FILE" ]; then
+    # 确保 .claude.json 是文件而不是目录
+    if [ -d "$CLAUDE_FILE" ]; then
+        echo "错误: $CLAUDE_FILE 是一个目录，但应该是文件。正在修复..."
+        sudo rm -rf "$CLAUDE_FILE"
+        sudo touch "$CLAUDE_FILE"
+        echo "已重新创建 $CLAUDE_FILE 为文件"
+    fi
     sudo chown dev:dev "$CLAUDE_FILE"
 fi
 
